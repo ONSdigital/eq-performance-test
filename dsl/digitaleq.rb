@@ -14,11 +14,11 @@ environment  = ARGV[0]
 thread_count = ARGV[1].to_i
 duration   = ARGV[2].to_i
 
-puts "Executing tests on http://"+ environment +".survey.eq.ons.digital/questionnaire/1 with "+thread_count.to_s+" users for "+duration.to_s+" seconds "
+puts "Executing tests on http://"+ environment +"-survey.eq.ons.digital/questionnaire/1 with "+thread_count.to_s+" users for "+duration.to_s+" seconds "
 
 test do
   threads count: thread_count, duration: duration, continue_forever: true do
-    visit name: 'Introduction', url: 'http://'+ environment +'.survey.eq.ons.digital/questionnaire/1'
+    visit name: 'Introduction', url: 'http://'+ environment +'-survey.eq.ons.digital/questionnaire/1'
         extract css: 'a.hyphenate', name: 'location'
     submit name: 'Question Page', url: '${location}',
          fill_in: {
