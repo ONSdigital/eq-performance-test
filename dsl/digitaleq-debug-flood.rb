@@ -18,7 +18,7 @@ flood_api = ARGV[3]
 puts "Executing tests on http://"+ environment +"-survey.eq.ons.digital/questionnaire/1 with "+thread_count.to_s+" users for "+duration.to_s+" seconds "
 
 test do
-  threads count: thread_count, duration: duration, continue_forever: true do
+  threads count: thread_count, rampup: 60,  duration: duration, continue_forever: true do
     visit name: 'Introduction', url: 'http://'+ environment +'-survey.eq.ons.digital/questionnaire/1?debug=True'
         extract css: 'a.hyphenate', name: 'location'
     submit name: 'Intro Page', url: '${location}',
