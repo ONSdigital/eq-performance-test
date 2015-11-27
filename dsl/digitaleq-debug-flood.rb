@@ -18,16 +18,29 @@ flood_api = ARGV[3]
 puts "Executing tests on http://"+ environment +"-survey.eq.ons.digital/questionnaire/1 with "+thread_count.to_s+" users for "+duration.to_s+" seconds "
 
 test do
-  threads count: thread_count, duration: duration, continue_forever: true do
+  threads count: thread_count, rampup: 60,  duration: duration, continue_forever: true do
     visit name: 'Introduction', url: 'http://'+ environment +'-survey.eq.ons.digital/questionnaire/1?debug=True'
         extract css: 'a.hyphenate', name: 'location'
-    submit name: 'Question Page', url: '${location}',
+    submit name: 'Intro Page', url: '${location}',
          fill_in: {
             start: 'Proceed'
          }
-    submit name: 'Complete Page', url: '${location}',
+    submit name: 'Section 1', url: '${location}',
          fill_in: {
-            EQ_0_1: 'Answer',
+            EQ_sectionOne_q2: 'Han',
+            EQ_sectionOne_q3: 'Episode 5: The Empire Strikes Back',
+            EQ_sectionOne_q4: 'BB8',
+            EQ_sectionOne_q5: 'BB8',
+            next: 'Save and continue'
+         }
+    submit name: 'Section 2', url: '${location}',
+         fill_in: {
+            EQ_sectionTwo_q1: '10',
+            next: 'Save and continue'
+         }
+     submit name: 'Section 3', url: '${location}',
+         fill_in: {
+            EQ_sectionThree_q1: 'Bring back the Ewoks',
             next: 'Save and continue'
          }
   end
@@ -38,3 +51,5 @@ end.flood(flood_api, {
     region: 'ap-southeast-2'
     }
 )
+
+
