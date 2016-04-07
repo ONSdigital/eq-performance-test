@@ -2,33 +2,26 @@
 
 ## Background
 
-This repo is a suite of performance tests to be run against the survey-runner component of the EQ platform. These can either be run locally
-via jmeter or vai the cloud hosted flood.io.
+This repo is a suite of performance tests to be run against the survey-runner component of the EQ platform using JMeter
 
 ## How to install
 
- * mac osx:
 	`brew install jmeter`
- * Ubuntu / Debian:
-	`apt-get install jmeter`
- * Other:
- 	`http://jmeter.apache.org/usermanual/get-started.html`
+
+## Getting the token
+
+You will need the survey runner repo for token generation
 
 ```
-git clone https://github.com/ONSdigital/eq-performance-test.git
-cd ./eq-performance-test/
-bundle install
+git clone https://github.com/ONSdigital/eq-survey-runner.git
+cd ./eq-survey-runner/
+python token_generator.py
 ```
 
-## Generating the Jmeter jmx file
+## How to run
 
 ```
-cd dsl
-ruby digitaleq-jmx.rb
-```
-
-
-## Executing on flood.io
-```
-ruby digitaleq-flood.rb
+Open JMeter and open Survey-runner.jmx in the application
+Insert the token generated in the decode http request
+Your ready to run the tests
 ```
