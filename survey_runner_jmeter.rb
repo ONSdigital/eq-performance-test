@@ -32,7 +32,7 @@ end
 
 def get_healthcheck()
     visit name: 'status', url: '/status' do
-        assert contains: 'OK'
+        assert contains: 'OK', scope: 'main'
     end
 end
 
@@ -60,7 +60,7 @@ def start_survey()
 
     # Go to the /dev page and start the questionnaire
     submit name: 'post dev form', url: '/dev', fill_in: jwt_params do
-        assert contains: ['Star Wars', jwt_params[:ru_name]]
+        assert contains: ['Star Wars', jwt_params[:ru_name]], scope: 'main'
         extract_url
     end
 end
@@ -68,7 +68,7 @@ end
 def post_introduction()
     submit name: 'continue introduction', url: '${url}',
             fill_in: { "action[start_questionnaire]":'' } do
-        assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released']
+        assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released'], scope: 'main'
         extract_url
     end
 end
@@ -87,7 +87,7 @@ def post_page_1_empty()
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"",
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"",
                 "action[save_continue]": "" } do
-        assert contains: ['This field is mandatory.', 'date entered is not valid']
+        assert contains: ['This field is mandatory.', 'date entered is not valid'], scope: 'main'
         extract_url
     end
 end
@@ -107,7 +107,7 @@ def post_page_1_filled()
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"2016",
                 "action[save_continue]": ""
             } do
-        assert contains: ['Ewokes', 'medal']
+        assert contains: ['Ewokes', 'medal'], scope: 'main'
         extract_url
     end
 end
@@ -119,7 +119,7 @@ def post_page_2_filled()
                 "7587qe9b-f24e-4dc0-ac94-66118b896c10":"No",
                 "action[save_continue]": ""
             } do
-        assert contains: 'Your responses'
+        assert contains: 'Your responses', scope: 'main'
         extract_url
     end
 end
@@ -127,7 +127,7 @@ end
 def post_final_submission()
     submit name: 'post final submission', url: '${url}',
             fill_in: { "action[submit_answers]": "" } do
-        assert contains: ['Thank You', 'Transaction ID']
+        assert contains: ['Thank You', 'Transaction ID'], scope: 'main'
     end
 end
 
