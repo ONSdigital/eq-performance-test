@@ -9,6 +9,7 @@ RESPONSE_TIMEOUT_MS = '10000'
 USERS = 300
 REPEAT = 1
 RAMP_UP = 5
+DURATION_SECONDS = 0
 STEP_DELAY_MS = '10000'
 STEP_DELAY_VARIANCE_MS = '5000'
 
@@ -24,14 +25,22 @@ end
 
 def initialise_variables()
     # Use a random number for the ru_ref
-    random_variable maximumValue: 10000000,
+    random_variable name: 'Random ru_ref',
+        maximumValue: 10000000,
         minimumValue: 1,
         perThread: false,
         variableName: 'ru_ref'
+
+    # Use a random number for the collection exercise
+    random_variable name: 'Random collection exercise',
+        maximumValue: 10000000,
+        minimumValue: 1,
+        perThread: false,
+        variableName: 'collect_exercise_sid'
 end
 
 def get_healthcheck()
-    visit name: 'status', url: '/status' do
+    visit name: 'Get /status', url: '/status' do
         assert contains: 'OK', scope: 'main'
     end
 end
@@ -47,7 +56,7 @@ def start_survey()
         exp: '1800',
         period_str: 'May 2016',
         period_id: '201605',
-        collection_exercise_sid: '000',
+        collection_exercise_sid: '${collect_exercise_sid}',
         ru_ref: '${ru_ref}',
         ru_name: 'JMeter',
         ref_p_start_date: '2016-05-01',
@@ -59,14 +68,14 @@ def start_survey()
     }
 
     # Go to the /dev page and start the questionnaire
-    submit name: 'post dev form', url: '/dev', fill_in: jwt_params do
+    submit name: 'POST /dev form', url: '/dev', fill_in: jwt_params do
         assert contains: ['Star Wars', jwt_params[:ru_name]], scope: 'main'
         extract_url
     end
 end
 
 def post_introduction()
-    submit name: 'continue introduction', url: '${url}',
+    submit name: 'POST introduction', url: '${url}',
             fill_in: { "action[start_questionnaire]":'' } do
         assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released'], scope: 'main'
         extract_url
@@ -74,7 +83,7 @@ def post_introduction()
 end
 
 def post_page_1_empty()
-    submit name: 'post page 1 (empty)', url: '${url}',
+    submit name: 'POST page 1 (empty)', url: '${url}',
             fill_in: {
                 "6cf5c72a-c1bf-4d0c-af6c-d0f07bc5b65b":"",
                 "92e49d93-cbdc-4bcb-adb2-0e0af6c9a07c":"",
@@ -93,7 +102,7 @@ def post_page_1_empty()
 end
 
 def post_page_1_filled()
-    submit name: 'post page 1 (filled)', url: '${url}',
+    submit name: 'POST page 1 (filled)', url: '${url}',
             fill_in: {
                 "6cf5c72a-c1bf-4d0c-af6c-d0f07bc5b65b":"99",
                 "92e49d93-cbdc-4bcb-adb2-0e0af6c9a07c":"1024",
@@ -113,7 +122,7 @@ def post_page_1_filled()
 end
 
 def post_page_2_filled()
-    submit name: 'post page 2 (filled)', url: '${url}',
+    submit name: 'POST page 2 (filled)', url: '${url}',
             fill_in: {
                 "215015b1-f87c-4740-9fd4-f01f707ef558":"No comment",
                 "7587qe9b-f24e-4dc0-ac94-66118b896c10":"No",
@@ -125,7 +134,7 @@ def post_page_2_filled()
 end
 
 def post_final_submission()
-    submit name: 'post final submission', url: '${url}',
+    submit name: 'POST final submission', url: '${url}',
             fill_in: { "action[submit_answers]": "" } do
         assert contains: ['Thank You', 'Transaction ID'], scope: 'main'
     end
@@ -134,7 +143,12 @@ end
 test do
     setup_test
 
-    threads count: USERS, loops: REPEAT, ramp_time: RAMP_UP do
+    USE_SCHEDULER = DURATION_SECONDS > 0 ? true : false
+    threads count: USERS,
+            loops: REPEAT,
+            ramp_time: RAMP_UP,
+            duration: DURATION_SECONDS,
+            scheduler: USE_SCHEDULER do
 
         initialise_variables
 
