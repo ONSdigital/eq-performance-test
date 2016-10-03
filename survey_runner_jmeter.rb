@@ -9,10 +9,10 @@ HOST = ENV['HOST']
 PROTOCOL = ENV['PROTOCOL']
 PORT = ENV['PORT']
 
-CONNECT_TIMEOUT_MS = '30000'
-RESPONSE_TIMEOUT_MS = '60000'
+CONNECT_TIMEOUT_MS = '240000'
+RESPONSE_TIMEOUT_MS = '240000'
 USERS = ENV['USERS'] || '100'
-REPEAT = 1
+REPEAT = ENV['REPEAT'] || '1'
 RAMP_UP = 5
 DURATION_SECONDS = 0
 STEP_DELAY_MS = '10000'
@@ -79,13 +79,13 @@ def start_survey()
     end
 end
 
-# def post_introduction()
-#     submit name: 'POST introduction', url: '${url}',
-#             fill_in: { "action[start_questionnaire]":'' } do
-#         assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released'], scope: 'main'
-#         extract_url
-#     end
-# end
+def post_introduction()
+    submit name: 'POST introduction', url: '${url}',
+            fill_in: { "action[start_questionnaire]":'' } do
+        assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released'], scope: 'main'
+        extract_url
+    end
+end
 
 def post_page_1_empty()
     submit name: 'POST page 1 (empty)', url: '${url}',
@@ -173,6 +173,8 @@ test do
 
             start_survey
 
+            # post_introduction
+
             post_page_1_empty
 
             post_page_1_filled
@@ -182,7 +184,28 @@ test do
 
         # Show the results in the UI
         view_results_tree
-        summary_report
+        # summary_report ({
+        #     "name":"TestName",
+        #     "xml":"true",
+        #     "fieldNames":"true",
+        #     "filename":"results/summaryReport.xml"
+        # })
+
+        summary_report update_at_xpath: [
+            # { "//xml" => 'true' },
+            { "//fieldNames" => 'true' },
+            { "//saveAssertionResultsFailureMessage" => 'true' },
+            { "//message" => 'true' },
+            { "//stringProp[@name='filename']" => 'results/summaryReport.csv' }
+        ]
+
+        aggregate_report update_at_xpath: [
+            # { "//xml" => 'true' },
+            { "//fieldNames" => 'true' },
+            { "//saveAssertionResultsFailureMessage" => 'true' },
+            { "//message" => 'true' },
+            { "//stringProp[@name='filename']" => 'results/aggregateReport.csv' }
+        ]
     end
 end.run(
     debug: true,

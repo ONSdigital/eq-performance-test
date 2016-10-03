@@ -15,4 +15,4 @@ RUN touch jmeter.log
 
 VOLUME /eq-performance-test/results
 
-CMD ruby survey_runner_jmeter.rb
+CMD tail -F jmeter.log & ruby survey_runner_jmeter.rb
