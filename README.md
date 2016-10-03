@@ -30,6 +30,21 @@ Finally install jmeter:
     ruby survey_runner_jmeter.rb
 
 
+## Build with docker
+    ./scripts/build_docker.sh
+
+
+## Run with docker
+
+    docker run \
+    	-e HOST=hostname \
+    	-e PROTOCOL=http \
+    	-e PORT=5000 \
+    	-e USERS=100 \
+    	-e REPEAT=10 \
+    	-v ~/testResults:/eq-performance-test/test \
+       eq-performance-test
+
 This opens JMeter with the Ruby generated .jmx file. You're ready to run the tests in JMeter now.
 
 
