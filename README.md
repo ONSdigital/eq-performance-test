@@ -31,7 +31,7 @@ Finally install jmeter:
 
 
 ## Build with docker
-    ./scripts/build_docker.sh
+    docker build . -t eq-performance-test
 
 
 ## Run with docker

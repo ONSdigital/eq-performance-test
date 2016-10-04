@@ -1,13 +1,9 @@
 require 'rubygems'
 require 'ruby-jmeter'
 
-# HOST = 'preprod-surveys.eq.ons.digital'
-# PROTOCOL = 'https'
-# PORT = '443'
-
-HOST = ENV['HOST']
-PROTOCOL = ENV['PROTOCOL']
-PORT = ENV['PORT']
+HOST = ENV['HOST'] || 'preprod-surveys.eq.ons.digital'
+PROTOCOL = ENV['PROTOCOL'] || 'https'
+PORT = ENV['PORT'] || '443'
 
 CONNECT_TIMEOUT_MS = '240000'
 RESPONSE_TIMEOUT_MS = '240000'
@@ -173,8 +169,6 @@ test do
 
             start_survey
 
-            # post_introduction
-
             post_page_1_empty
 
             post_page_1_filled
@@ -182,17 +176,7 @@ test do
             post_final_submission
         end
 
-        # Show the results in the UI
-        view_results_tree
-        # summary_report ({
-        #     "name":"TestName",
-        #     "xml":"true",
-        #     "fieldNames":"true",
-        #     "filename":"results/summaryReport.xml"
-        # })
-
         summary_report update_at_xpath: [
-            # { "//xml" => 'true' },
             { "//fieldNames" => 'true' },
             { "//saveAssertionResultsFailureMessage" => 'true' },
             { "//message" => 'true' },
@@ -200,7 +184,6 @@ test do
         ]
 
         aggregate_report update_at_xpath: [
-            # { "//xml" => 'true' },
             { "//fieldNames" => 'true' },
             { "//saveAssertionResultsFailureMessage" => 'true' },
             { "//message" => 'true' },
