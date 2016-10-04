@@ -42,7 +42,7 @@ Finally install jmeter:
     	-e PORT=5000 \
     	-e USERS=100 \
     	-e REPEAT=10 \
-    	-v ~/testResults:/eq-performance-test/test \
+    	-v ~/testResults:/eq-performance-test/results \
        eq-performance-test
 
 This opens JMeter with the Ruby generated .jmx file. You're ready to run the tests in JMeter now.
