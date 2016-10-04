@@ -1,13 +1,14 @@
 require 'rubygems'
 require 'ruby-jmeter'
 
-HOST = 'preprod-surveys.eq.ons.digital'
-PROTOCOL = 'https'
-PORT = '443'
-CONNECT_TIMEOUT_MS = '10000'
-RESPONSE_TIMEOUT_MS = '10000'
-USERS = 300
-REPEAT = 1
+HOST = ENV['HOST'] || 'preprod-surveys.eq.ons.digital'
+PROTOCOL = ENV['PROTOCOL'] || 'https'
+PORT = ENV['PORT'] || '443'
+
+CONNECT_TIMEOUT_MS = '240000'
+RESPONSE_TIMEOUT_MS = '240000'
+USERS = ENV['USERS'] || '100'
+REPEAT = ENV['REPEAT'] || '1'
 RAMP_UP = 5
 DURATION_SECONDS = 0
 STEP_DELAY_MS = '10000'
@@ -52,7 +53,7 @@ end
 def start_survey()
     jwt_params = {
         user_id: 'ruby-jmeter',
-        schema: '0_star_wars.json',
+        schema: '1_0205.json',
         exp: '1800',
         period_str: 'May 2016',
         period_id: '201605',
@@ -69,7 +70,7 @@ def start_survey()
 
     # Go to the /dev page and start the questionnaire
     submit name: 'POST /dev form', url: '/dev', fill_in: jwt_params do
-        assert contains: ['Star Wars', jwt_params[:ru_name]], scope: 'main'
+        assert contains: ['Monthly Business Survey - Retail Sales Index', jwt_params[:ru_name]], scope: 'main'
         extract_url
     end
 end
@@ -85,10 +86,6 @@ end
 def post_page_1_empty()
     submit name: 'POST page 1 (empty)', url: '${url}',
             fill_in: {
-                "6cf5c72a-c1bf-4d0c-af6c-d0f07bc5b65b":"",
-                "92e49d93-cbdc-4bcb-adb2-0e0af6c9a07c":"",
-                "a5dc09e8-36f2-4bf4-97be-c9e6ca8cbe0d":"",
-                "9587eb9b-f24e-4dc0-ac94-66117b896c10[]":"",
                 "6fd644b0-798e-4a58-a393-a438b32fe637-day":"",
                 "6fd644b0-798e-4a58-a393-a438b32fe637-month":"",
                 "6fd644b0-798e-4a58-a393-a438b32fe637-year":"",
@@ -96,7 +93,7 @@ def post_page_1_empty()
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"",
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"",
                 "action[save_continue]": "" } do
-        assert contains: ['This field is mandatory.', 'date entered is not valid'], scope: 'main'
+        assert contains: ['These must be corrected to continue.', 'date entered is not valid'], scope: 'main'
         extract_url
     end
 end
@@ -104,39 +101,45 @@ end
 def post_page_1_filled()
     submit name: 'POST page 1 (filled)', url: '${url}',
             fill_in: {
-                "6cf5c72a-c1bf-4d0c-af6c-d0f07bc5b65b":"99",
-                "92e49d93-cbdc-4bcb-adb2-0e0af6c9a07c":"1024",
-                "a5dc09e8-36f2-4bf4-97be-c9e6ca8cbe0d":"Lion",
-                "9587eb9b-f24e-4dc0-ac94-66117b896c10[]":"Yoda",
+                # sales period
+                #  from
                 "6fd644b0-798e-4a58-a393-a438b32fe637-day":"1",
-                "6fd644b0-798e-4a58-a393-a438b32fe637-month":"6",
+                "6fd644b0-798e-4a58-a393-a438b32fe637-month":"1",
                 "6fd644b0-798e-4a58-a393-a438b32fe637-year":"2015",
+                #  to
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-day":"1",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"5",
+                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"1",
                 "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"2016",
+                # total sales of food
+                "bb8168e6-2272-450d-b5a7-d3170508efb2":"10000",
+                # total sales of alcohol
+                "fee0b9fe-4c3a-4c14-9611-4fa9e2e9578a":"15000",
+                # total sales of clothing
+                "01ac2ebf-d49d-45e8-8f7a-0f847aa7cf25":"20000",
+                # total sales of household goods
+                "7605c4a9-2c3a-483c-908b-e07244105ac4":"25000",
+                # total sales of other goods
+                "5843e26e-a139-4645-baa9-51bdb0aba27b":"30000",
+                # total retail turnover
+                "e81adc6d-6fb0-4155-969c-d0d646f15345":"120000",
+                # from internet sales
+                "4b75a6f7-9774-4b2b-82dc-976561189a99":"60000",
+                # sales of automotive fuel
+                "b2bac3ed-5504-43ef-a883-f9ca8496aca3":"0",
+                # Comments
+                "fef6edc2-d98c-4d4d-9a7c-997ce10c361f":"",
                 "action[save_continue]": ""
             } do
-        assert contains: ['Ewokes', 'medal'], scope: 'main'
+    assert contains: 'Your responses', scope: 'main'
         extract_url
     end
 end
 
-def post_page_2_filled()
-    submit name: 'POST page 2 (filled)', url: '${url}',
-            fill_in: {
-                "215015b1-f87c-4740-9fd4-f01f707ef558":"No comment",
-                "7587qe9b-f24e-4dc0-ac94-66118b896c10":"No",
-                "action[save_continue]": ""
-            } do
-        assert contains: 'Your responses', scope: 'main'
-        extract_url
-    end
-end
 
 def post_final_submission()
     submit name: 'POST final submission', url: '${url}',
             fill_in: { "action[submit_answers]": "" } do
-        assert contains: ['Thank You', 'Transaction ID'], scope: 'main'
+        assert contains: ['Submission Successful', 'Transaction ID'], scope: 'main'
     end
 end
 
@@ -144,7 +147,7 @@ test do
     setup_test
 
     USE_SCHEDULER = DURATION_SECONDS > 0 ? true : false
-    threads count: USERS,
+    threads count: USERS.to_i,
             loops: REPEAT,
             ramp_time: RAMP_UP,
             duration: DURATION_SECONDS,
@@ -166,22 +169,28 @@ test do
 
             start_survey
 
-            post_introduction
-
             post_page_1_empty
 
             post_page_1_filled
 
-            post_page_2_filled
-
             post_final_submission
         end
 
-        # Show the results in the UI
-        view_results_tree
-        summary_report
+        summary_report update_at_xpath: [
+            { "//fieldNames" => 'true' },
+            { "//saveAssertionResultsFailureMessage" => 'true' },
+            { "//message" => 'true' },
+            { "//stringProp[@name='filename']" => 'results/summaryReport.csv' }
+        ]
+
+        aggregate_report update_at_xpath: [
+            { "//fieldNames" => 'true' },
+            { "//saveAssertionResultsFailureMessage" => 'true' },
+            { "//message" => 'true' },
+            { "//stringProp[@name='filename']" => 'results/aggregateReport.csv' }
+        ]
     end
 end.run(
-    file: 'survey_runner_jmeter.jmx',
-    jtl: 'result.jtl',
-    gui: true)
+    debug: true,
+    file: 'results/survey_runner_jmeter.jmx',
+    jtl: 'results/result.jtl')
