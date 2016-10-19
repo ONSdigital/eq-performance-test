@@ -78,7 +78,7 @@ end
 def post_introduction()
     submit name: 'POST introduction', url: '${url}',
             fill_in: { "action[start_questionnaire]":'' } do
-        assert contains: ['Star Wars Quiz', 'When was The Empire Strikes Back released'], scope: 'main'
+        assert contains: ['What are the dates of the sales period you are reporting for'], scope: 'main'
         extract_url
     end
 end
@@ -169,12 +169,16 @@ test do
 
             start_survey
 
+            post_introduction
+
             post_page_1_empty
 
             post_page_1_filled
 
             post_final_submission
         end
+
+        view_results_tree
 
         summary_report update_at_xpath: [
             { "//fieldNames" => 'true' },
