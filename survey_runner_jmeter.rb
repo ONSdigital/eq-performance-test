@@ -50,6 +50,10 @@ def extract_url()
     extract regex: '(.*)', name: 'url', useHeaders: 'URL'
 end
 
+def extract_url_without_block()
+    extract regex: '(^(.*[\\\/]))', name: 'url', useHeaders: 'URL'
+end
+
 def start_survey()
     jwt_params = {
         user_id: 'ruby-jmeter',
@@ -131,13 +135,14 @@ def post_page_1_filled()
                 "action[save_continue]": ""
             } do
     assert contains: 'Your responses', scope: 'main'
-        extract_url
+        extract_url_without_block
     end
 end
 
 
 def post_final_submission()
-    submit name: 'POST final submission', url: '${url}',
+
+    submit name: 'POST final submission', url: '${url}submit-answers',
             fill_in: { "action[submit_answers]": "" } do
         assert contains: ['Submission Successful', 'Transaction ID'], scope: 'main'
     end
