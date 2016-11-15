@@ -56,6 +56,7 @@ def start_survey()
         schema: '1_0205.json',
         exp: '1800',
         period_str: 'May 2016',
+        period_id: '201605',
         collection_exercise_sid: '${collect_exercise_sid}',
         ru_ref: '${ru_ref}',
         ru_name: 'JMeter',
