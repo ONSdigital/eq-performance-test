@@ -27,8 +27,8 @@ end
 def initialise_variables()
     # Use a random number for the ru_ref
     random_variable name: 'Random ru_ref',
-        maximumValue: 90000000,
-        minimumValue: 10000000,
+        maximumValue: 900000000000,
+        minimumValue: 100000000000,
         perThread: false,
         variableName: 'ru_ref'
 
