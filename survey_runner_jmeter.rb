@@ -27,8 +27,8 @@ end
 def initialise_variables()
     # Use a random number for the ru_ref
     random_variable name: 'Random ru_ref',
-        maximumValue: 10000000,
-        minimumValue: 1,
+        maximumValue: 900000000000,
+        minimumValue: 100000000000,
         perThread: false,
         variableName: 'ru_ref'
 
@@ -48,6 +48,10 @@ end
 
 def extract_url()
     extract regex: '(.*)', name: 'url', useHeaders: 'URL'
+end
+
+def extract_url_without_block()
+    extract regex: '(^(.*[\\\/]))', name: 'url', useHeaders: 'URL'
 end
 
 def start_survey()
@@ -131,13 +135,14 @@ def post_page_1_filled()
                 "action[save_continue]": ""
             } do
     assert contains: 'Your responses', scope: 'main'
-        extract_url
+        extract_url_without_block
     end
 end
 
 
 def post_final_submission()
-    submit name: 'POST final submission', url: '${url}',
+
+    submit name: 'POST final submission', url: '${url}submit-answers',
             fill_in: { "action[submit_answers]": "" } do
         assert contains: ['Submission Successful', 'Transaction ID'], scope: 'main'
     end
