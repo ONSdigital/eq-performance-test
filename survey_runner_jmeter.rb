@@ -90,12 +90,12 @@ end
 def post_page_1_empty()
     submit name: 'POST page 1 (empty)', url: '${url}',
             fill_in: {
-                "6fd644b0-798e-4a58-a393-a438b32fe637-day":"",
-                "6fd644b0-798e-4a58-a393-a438b32fe637-month":"",
-                "6fd644b0-798e-4a58-a393-a438b32fe637-year":"",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-day":"",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"",
+                "period-from-day":"",
+                "period-from-month":"",
+                "period-from-year":"",
+                "period-to-day":"",
+                "period-to-month":"",
+                "period-to-year":"",
                 "action[save_continue]": "" } do
         assert contains: ['These must be corrected to continue.', 'date entered is not valid'], scope: 'main'
         extract_url
@@ -107,34 +107,25 @@ def post_page_1_filled()
             fill_in: {
                 # sales period
                 #  from
-                "6fd644b0-798e-4a58-a393-a438b32fe637-day":"1",
-                "6fd644b0-798e-4a58-a393-a438b32fe637-month":"1",
-                "6fd644b0-798e-4a58-a393-a438b32fe637-year":"2015",
+                "period-from-day":"1",
+                "period-from-month":"1",
+                "period-from-year":"2015",
                 #  to
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-day":"1",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-month":"1",
-                "06a6a4b7-6ce4-4687-879d-3443cd8e2ff0-year":"2016",
-                # total sales of food
-                "bb8168e6-2272-450d-b5a7-d3170508efb2":"10000",
-                # total sales of alcohol
-                "fee0b9fe-4c3a-4c14-9611-4fa9e2e9578a":"15000",
-                # total sales of clothing
-                "01ac2ebf-d49d-45e8-8f7a-0f847aa7cf25":"20000",
-                # total sales of household goods
-                "7605c4a9-2c3a-483c-908b-e07244105ac4":"25000",
-                # total sales of other goods
-                "5843e26e-a139-4645-baa9-51bdb0aba27b":"30000",
-                # total retail turnover
-                "e81adc6d-6fb0-4155-969c-d0d646f15345":"120000",
-                # from internet sales
-                "4b75a6f7-9774-4b2b-82dc-976561189a99":"60000",
-                # sales of automotive fuel
-                "b2bac3ed-5504-43ef-a883-f9ca8496aca3":"0",
-                # Comments
-                "fef6edc2-d98c-4d4d-9a7c-997ce10c361f":"",
+                "period-to-day":"1",
+                "period-to-month":"1",
+                "period-to-year":"2016",
+                "total-sales-food":"10000",
+                "total-sales-alcohol":"15000",
+                "total-sales-clothing":"20000",
+                "total-sales-household-goods":"25000",
+                "total-sales-other-goods":"30000",
+                "total-retail-turnover":"120000",
+                "internet-sales":"60000",
+                "total-sales-automotive-fuel":"0",
+                "reason-for-change":"",
                 "action[save_continue]": ""
             } do
-    assert contains: 'Your responses', scope: 'main'
+        assert contains: 'Your responses', scope: 'main'
         extract_url_without_block
     end
 end
