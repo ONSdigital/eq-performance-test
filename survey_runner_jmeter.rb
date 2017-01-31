@@ -190,7 +190,4 @@ test do
             { "//stringProp[@name='filename']" => 'results/aggregateReport.csv' }
         ]
     end
-end.run(
-    debug: true,
-    file: 'results/survey_runner_jmeter.jmx',
-    jtl: 'results/result.jtl')
+end.flood(ENV['FLOOD_API_TOKEN'])

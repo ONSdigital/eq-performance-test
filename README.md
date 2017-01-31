@@ -41,7 +41,7 @@ Finally install jmeter:
     	-e PROTOCOL=http \
     	-e PORT=5000 \
     	-e USERS=100 \
-    	-e REPEAT=10 \
+    	-e FLOOD_API_TOKEN=aQvGEPpXQpwwUSJgJzUd \
     	-v ~/testResults:/eq-performance-test/results \
        eq-performance-test
 
