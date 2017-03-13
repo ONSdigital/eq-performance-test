@@ -47,6 +47,9 @@ Finally install jmeter:
 
 This opens JMeter with the Ruby generated .jmx file. You're ready to run the tests in JMeter now.
 
+To run against a local survey runner on MacOS you will need to add an alias to the loopback network device by
+running `sudo ifconfig lo0 alias 10.200.10.1/24` then you can set the environmental variable HOST to `10.200.10.1`.
+See https://docs.docker.com/docker-for-mac/networking/#known-limitations-use-cases-and-workarounds
 
 ## Further Information
 See https://github.com/flood-io/ruby-jmeter

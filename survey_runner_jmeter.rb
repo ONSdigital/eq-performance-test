@@ -50,8 +50,8 @@ def extract_url()
     extract regex: '(.*)', name: 'url', useHeaders: 'URL'
 end
 
-def extract_url_without_block()
-    extract regex: '(^(.*[\\\/]))', name: 'url', useHeaders: 'URL'
+def extract_csrf()
+    extract regex: '<input id="csrf_token" name="csrf_token" type="hidden" value="(.+?)">', name: 'csrf_token'
 end
 
 def start_survey()
@@ -76,14 +76,18 @@ def start_survey()
     submit name: 'POST /dev form', url: '/dev', fill_in: jwt_params do
         assert contains: ['Monthly Business Survey - Retail Sales Index', jwt_params[:ru_name]], scope: 'main'
         extract_url
+        extract_csrf
     end
 end
 
 def post_introduction()
     submit name: 'POST introduction', url: '${url}',
-            fill_in: { "action[start_questionnaire]":'' } do
+            fill_in: {
+              "action[start_questionnaire]":"",
+              "csrf_token" => "${csrf_token}" } do
         assert contains: ['What are the dates of the sales period you are reporting for'], scope: 'main'
         extract_url
+        extract_csrf
     end
 end
 
@@ -96,9 +100,11 @@ def post_page_1_empty()
                 "period-to-day":"",
                 "period-to-month":"",
                 "period-to-year":"",
-                "action[save_continue]": "" } do
+                "action[save_continue]": "",
+                "csrf_token" => "${csrf_token}" } do
         assert contains: ['These must be corrected to continue.', 'date entered is not valid'], scope: 'main'
         extract_url
+        extract_csrf
     end
 end
 
@@ -123,18 +129,21 @@ def post_page_1_filled()
                 "internet-sales":"60000",
                 "total-sales-automotive-fuel":"0",
                 "reason-for-change":"",
-                "action[save_continue]": ""
+                "action[save_continue]": "",
+                "csrf_token" => "${csrf_token}"
             } do
         assert contains: 'Your responses', scope: 'main'
-        extract_url_without_block
+        extract_url
+        extract_csrf
     end
 end
 
 
 def post_final_submission()
 
-    submit name: 'POST final submission', url: '${url}submit-answers',
-            fill_in: { "action[submit_answers]": "" } do
+    submit name: 'POST final submission', url: '${url}',
+            fill_in: { "action[submit_answers]": "",
+            "csrf_token" => "${csrf_token}" } do
         assert contains: ['Submission Successful', 'Transaction ID'], scope: 'main'
     end
 end
