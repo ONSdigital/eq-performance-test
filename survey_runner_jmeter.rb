@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'ruby-jmeter'
 
-HOST = ENV['HOST'] || 'preprod-surveys.eq.ons.digital'
+LAUNCHER_HOST = ENV['LAUNCHER_HOST'] || 'preprod-new-surveys-launch.eq.ons.digital'
+HOST = ENV['HOST'] || 'preprod-new-surveys.eq.ons.digital'
 PROTOCOL = ENV['PROTOCOL'] || 'https'
 PORT = ENV['PORT'] || '443'
 
@@ -57,7 +58,7 @@ end
 def start_survey()
     jwt_params = {
         user_id: 'ruby-jmeter',
-        schema: '1_0205.json',
+        schema: '2_0001.json',
         exp: '1800',
         period_str: 'May 2016',
         period_id: '201605',
@@ -69,70 +70,71 @@ def start_survey()
         return_by: '2016-06-12',
         trad_as: 'Ruby JMeter',
         employment_date: '2016-06-10',
-        submit: ''
+        action_launch: 'Open Survey'
     }
 
     # Go to the /dev page and start the questionnaire
-    submit name: 'POST /dev form', url: '/dev', fill_in: jwt_params do
-        assert contains: ['Monthly Business Survey - Retail Sales Index', jwt_params[:ru_name]], scope: 'main'
+    submit name: 'POST launcher', url: LAUNCHER_HOST, fill_in: jwt_params do
+        assert contains: ['Quarterly Business Survey', jwt_params[:ru_name]], scope: 'main'
         extract_url
         extract_csrf
     end
 end
 
 def post_introduction()
+    header [
+        { name: 'referer', value: '${url}' }
+    ]
+
     submit name: 'POST introduction', url: '${url}',
             fill_in: {
               "action[start_questionnaire]":"",
               "csrf_token" => "${csrf_token}" } do
-        assert contains: ['What are the dates of the sales period you are reporting for'], scope: 'main'
+        assert contains: ['On 1 May 2016, what was the number of employees for Ruby JMeter'], scope: 'main'
         extract_url
         extract_csrf
     end
 end
 
-def post_page_1_empty()
-    submit name: 'POST page 1 (empty)', url: '${url}',
+def post_number_of_employees()
+    submit name: 'POST number of employees', url: '${url}',
             fill_in: {
-                "period-from-day":"",
-                "period-from-month":"",
-                "period-from-year":"",
-                "period-to-day":"",
-                "period-to-month":"",
-                "period-to-year":"",
+                "number-of-employees-total": "4",
                 "action[save_continue]": "",
                 "csrf_token" => "${csrf_token}" } do
-        assert contains: ['These must be corrected to continue.', 'date entered is not valid'], scope: 'main'
+        assert contains: ['Of the 4 total employees employed on 1 May 2016, how many male and female employees worked the following hours?'], scope: 'main'
         extract_url
         extract_csrf
     end
 end
 
-def post_page_1_filled()
-    submit name: 'POST page 1 (filled)', url: '${url}',
+def post_employees_breakdown_invalid()
+    submit name: 'POST employees breakdown (invalid)', url: '${url}',
             fill_in: {
-                # sales period
-                #  from
-                "period-from-day":"1",
-                "period-from-month":"1",
-                "period-from-year":"2015",
-                #  to
-                "period-to-day":"1",
-                "period-to-month":"1",
-                "period-to-year":"2016",
-                "total-sales-food":"10000",
-                "total-sales-alcohol":"15000",
-                "total-sales-clothing":"20000",
-                "total-sales-household-goods":"25000",
-                "total-sales-other-goods":"30000",
-                "total-retail-turnover":"120000",
-                "internet-sales":"60000",
-                "total-sales-automotive-fuel":"0",
-                "reason-for-change":"",
+                "number-of-employees-male-more-30-hours": "2",
+                "number-of-employees-female-more-30-hours": "2",
+                "number-of-employees-male-less-30-hours": "2",
+                "number-of-employees-female-less-30-hours": "2",
                 "action[save_continue]": "",
                 "csrf_token" => "${csrf_token}"
             } do
-        assert contains: 'Your responses', scope: 'main'
+        assert contains: ['These must be corrected to continue.'], scope: 'main'
+        extract_url
+        extract_csrf
+    end
+end
+
+def post_employees_breakdown_valid()
+    submit name: 'POST employees breakdown (valid)', url: '${url}',
+            fill_in: {
+                "number-of-employees-male-more-30-hours": "1",
+                "number-of-employees-female-more-30-hours": "1",
+                "number-of-employees-male-less-30-hours": "1",
+                "number-of-employees-female-less-30-hours": "1",
+                "action[save_continue]": "",
+                "csrf_token" => "${csrf_token}"
+            } do
+        assert contains: 'Please check your answers carefully before submitting.', scope: 'main'
         extract_url
         extract_csrf
     end
@@ -176,9 +178,11 @@ test do
 
             post_introduction
 
-            post_page_1_empty
+            post_number_of_employees
 
-            post_page_1_filled
+            post_employees_breakdown_invalid
+
+            post_employees_breakdown_valid
 
             post_final_submission
         end
