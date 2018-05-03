@@ -32,13 +32,6 @@ def initialise_variables()
         minimumValue: 100000000000,
         perThread: false,
         variableName: 'ru_ref'
-
-    # Use a random number for the collection exercise
-    random_variable name: 'Random collection exercise',
-        maximumValue: 10000000,
-        minimumValue: 1,
-        perThread: false,
-        variableName: 'collect_exercise_sid'
 end
 
 def get_healthcheck()
@@ -62,7 +55,7 @@ def start_survey()
         exp: '1800',
         period_str: 'May 2016',
         period_id: '201605',
-        collection_exercise_sid: '${collect_exercise_sid}',
+        collection_exercise_sid: '${__UUID()}',
         ru_ref: '${ru_ref}',
         ru_name: 'JMeter',
         ref_p_start_date: '2016-05-01',
